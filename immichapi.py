@@ -10,8 +10,9 @@ class ImmichApi(object):
         self.dry_run = False
         self.dupsfile = None
         self.url = "http://localhost:2283/api"
+        self.env_file = ".env"
         self.headers = {
-            "x-api-key": "WqJUfg7lvbcRGic7rXmkNafE5C7GQ4zxwiZkBusXY18",
+            "x-api-key": None,
             "accept": "application/json",
             "content-type": "application/json",
         }
@@ -21,6 +22,16 @@ class ImmichApi(object):
 
         for k, v in kwargs.items():
             setattr(self, k, v)
+
+        with open(self.env_file, "r") as ENV:
+            for line in (l.strip() for l in ENV.readlines()):
+                if not line:
+                    continue
+                if line.startswith("#"):
+                    continue
+                k, v = (val.strip() for val in line.split("="))
+                if k.lower() == "x_api_key":
+                    self.headers["x-api-key"] = v
 
         if self.dupsfile:
             try:
